@@ -1,13 +1,14 @@
 <script setup>
 import {onMounted, watch} from 'vue';
 
-const waveFunc = defineModel();
+// const waveFunc = defineModel();
 
-watch(waveFunc, (value, oldValue, onCleanup) => {
-  clearCanvas();
-  drawGrid();
-  drawWave();
-}, { deep: true})
+const props = defineProps(['waveFunc'])
+
+watch(() => props.waveFunc, (value) => {
+  console.log(value);
+  drawDisplay(value);
+}, { deep: true, immediate: true})
 
 let v = 1000;
 let h = 500;
@@ -15,16 +16,25 @@ let vConst = (Math.PI*2/v);
 let hConst = h/16
 
 
-function clearCanvas() {
+function drawDisplay(waveFunc) {
   const ctx = getContext();
-  ctx.clearRect(0, 0, v, h);
+  if (ctx) {
+    clearCanvas(ctx);
+    drawGrid(ctx);
+    drawWave(waveFunc, ctx);
+  }
 }
+
 function getContext() {
   const canvas = document.getElementById('display-canvas');
-  return canvas.getContext('2d');
+  return canvas ? canvas.getContext('2d') : null;
 }
-function drawGrid() {
-  const ctx = getContext();
+
+function clearCanvas(ctx) {
+  ctx.clearRect(0, 0, v, h);
+}
+
+function drawGrid(ctx) {
   ctx.beginPath();
   // Draw vertical lines
   for(let x = 0; x <= v; x += v/32) {
@@ -57,12 +67,11 @@ function drawGrid() {
   ctx.lineWidth = 1;
   ctx.stroke(); // strokes the drawing to the canvas
 }
-function drawWave() {
-  const ctx = getContext();
+function drawWave(waveFunc, ctx) {
   ctx.beginPath();
 
   for(let x=0; x<=v; x+=1) {
-    let ys = waveFunc.value.map((func) => func.a*hConst*Math.sin(func.b*vConst*x+(func.c*Math.PI/2)));
+    let ys = waveFunc.map((func) => func.a*hConst*Math.sin(func.b*vConst*x+(func.c*Math.PI/2)));
 
     let y = h/2 - ys.reduce((a,b) => a+b);
     // let y = h/2 - waveFunc.value.a*hConst*Math.sin(waveFunc.value.b*vConst*x+(waveFunc.value.c*Math.PI/2));
@@ -79,8 +88,7 @@ function drawWave() {
 }
 
 onMounted(() => {
-  drawGrid();
-  drawWave();
+  drawDisplay(props.waveFunc);
 })
 
 </script>

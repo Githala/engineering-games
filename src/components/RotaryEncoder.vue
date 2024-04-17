@@ -1,9 +1,26 @@
 <script setup>
+import {computed} from 'vue';
+
+let step = defineModel('step')
+const maxSteps = defineModel('maxSteps')
+
+// const model = defineModel()
+    // defineProps(['step', 'maxSteps'])
+// const emit = defineEmits(['update:step'])
+
+let rotate = computed(() => {
+  console.log(step.value, maxSteps.value);
+  return `transform: rotate(${step.value / maxSteps.value * 360}deg)`
+})
+
+function clicked() {
+  step.value++
+}
 
 </script>
 
 <template>
-  <div class="circle">
+  <div class="circle" :style="rotate" @click="clicked">
   <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <linearGradient gradientUnits="userSpaceOnUse" x1="189.251" y1="179.572" x2="189.251" y2="244.234" id="gradient-0">
@@ -22,6 +39,5 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    //rotate: 15deg;
   }
 </style>
