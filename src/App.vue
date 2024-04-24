@@ -1,14 +1,16 @@
 <script setup>
-import Display from '@/components/Display.vue';
+import Display from '@/components/GraphDisplay.vue';
 import {ref} from 'vue';
 import RotaryEncoder from '@/components/RotaryEncoder.vue';
+import StringDisplay from '@/components/StringDisplay.vue';
+import SineWave from '@/models/SineWave.js';
 
 const steps = ref(10);
 
 const waveFunc = ref([
-  { a: 1, b: 1, c: 2 },
-  { a: 2, b: 3, c: 4 },
-  { a: 1, b: 10, c: 3 }
+    new SineWave(1,1, 2),
+    new SineWave(2,3, 4),
+    new SineWave(1,10, 3)
 ])
 
 function addA(a,b) {
@@ -27,56 +29,22 @@ function addC(a,b) {
 <template>
   <main>
     <Display :wave-func="waveFunc" />
-    <div style="display: flex; gap: 30px">
-      <div>
-        <RotaryEncoder :max-steps="10" v-model:step="waveFunc[0].a" v-model:max-steps="steps"></RotaryEncoder>
-        <div>
-          <button @click="addA(0,1)">A++</button>
-          <button @click="addA(0,-1)">A--</button>
+    <div>
+      <div v-for="(f,index) in waveFunc" class="wave-functions">
+        <h2>
+<!--          <input type="checkbox">-->
+          Sine {{index}}</h2>
+        <div class="rotary-input">
+          <StringDisplay>{{f.a}}</StringDisplay>
+          <RotaryEncoder :max-steps="10" v-model:step="f.a" v-model:max-steps="steps"></RotaryEncoder>
         </div>
-        <RotaryEncoder :max-steps="10" v-model:step="waveFunc[0].b" v-model:max-steps="steps"></RotaryEncoder>
-        <div>
-          <button @click="addB(0,1)">B++</button>
-          <button @click="addB(0,-1)">B--</button>
+        <div class="rotary-input">
+          <StringDisplay>{{f.b}}</StringDisplay>
+          <RotaryEncoder :max-steps="10" v-model:step="f.b" v-model:max-steps="steps"></RotaryEncoder>
         </div>
-        <RotaryEncoder :max-steps="10" v-model:step="waveFunc[0].c" v-model:max-steps="steps"></RotaryEncoder>
-        <div>
-          <button @click="addC(0,1)">C++</button>
-          <button @click="addC(0,-1)">C--</button>
-        </div>
-      </div>
-      <div>
-        <RotaryEncoder :max-steps="10" v-model:step="waveFunc[1].a" v-model:max-steps="steps"></RotaryEncoder>
-        <div>
-          <button @click="addA(1,1)">A++</button>
-          <button @click="addA(1,-1)">A--</button>
-        </div>
-        <RotaryEncoder :max-steps="10" v-model:step="waveFunc[1].b" v-model:max-steps="steps"></RotaryEncoder>
-        <div>
-          <button @click="addB(1,1)">B++</button>
-          <button @click="addB(1,-1)">B--</button>
-        </div>
-        <RotaryEncoder :max-steps="10" v-model:step="waveFunc[1].c" v-model:max-steps="steps"></RotaryEncoder>
-        <div>
-          <button @click="addC(1,1)">C++</button>
-          <button @click="addC(1,-1)">C--</button>
-        </div>
-      </div>
-      <div>
-        <RotaryEncoder :max-steps="10" v-model:step="waveFunc[2].a" v-model:max-steps="steps"></RotaryEncoder>
-        <div>
-          <button @click="addA(2,1)">A++</button>
-          <button @click="addA(2,-1)">A--</button>
-        </div>
-        <RotaryEncoder :max-steps="10" v-model:step="waveFunc[2].b" v-model:max-steps="steps"></RotaryEncoder>
-        <div>
-          <button @click="addB(2,1)">B++</button>
-          <button @click="addB(2,-1)">B--</button>
-        </div>
-        <RotaryEncoder :max-steps="10" v-model:step="waveFunc[2].c" v-model:max-steps="steps"></RotaryEncoder>
-        <div>
-          <button @click="addC(2,1)">C++</button>
-          <button @click="addC(2,-1)">C--</button>
+        <div class="rotary-input">
+          <StringDisplay>{{f.c}}</StringDisplay>
+          <RotaryEncoder :max-steps="10" v-model:step="f.c" v-model:max-steps="steps"></RotaryEncoder>
         </div>
       </div>
     </div>
@@ -86,4 +54,28 @@ function addC(a,b) {
 </template>
 
 <style scoped>
+input[type=checkbox] {
+  margin-right: 10px;
+}
+
+h2 {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.rotary-input {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.wave-functions {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  align-items: center;
+  border-bottom: 1px solid grey;
+  padding-bottom: 20px;
+  margin-bottom: 10px;
+}
 </style>
