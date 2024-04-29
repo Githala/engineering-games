@@ -3,11 +3,11 @@ import {onMounted, watch} from 'vue';
 
 // const waveFunc = defineModel();
 
-const props = defineProps(['waveFunc'])
+const props = defineProps(['waveFunc', 'targetWaveFunc'])
 
 watch(() => props.waveFunc, (value) => {
   console.log(value);
-  drawDisplay(value);
+  drawDisplay();
 }, { deep: true, immediate: true})
 
 let v = 1000;
@@ -16,12 +16,16 @@ let vConst = (Math.PI*2/v);
 let hConst = h/16
 
 
-function drawDisplay(waveFunc) {
+function drawDisplay() {
+  let waveFunc = props.waveFunc;
+  let targetWaveFunc = props.targetWaveFunc;
+
   const ctx = getContext();
   if (ctx) {
     clearCanvas(ctx);
     drawGrid(ctx);
     drawWave(waveFunc, ctx);
+    drawTargetWave(targetWaveFunc, ctx);
   }
 }
 
@@ -67,7 +71,26 @@ function drawGrid(ctx) {
   ctx.lineWidth = 1;
   ctx.stroke(); // strokes the drawing to the canvas
 }
+
 function drawWave(waveFunc, ctx) {
+ doDrawWave(waveFunc, ctx);
+
+  ctx.strokeStyle = `rgb(200 255 200)`;
+  ctx.lineWidth = 2;
+  ctx.stroke(); // strokes the drawing to the canvas
+  ctx.strokeStyle = `rgb(0 255 0)`;
+  ctx.lineWidth = 1;
+  ctx.stroke(); // strokes the drawing to the canvas
+}
+
+function drawTargetWave(targetWaveFunc, ctx) {
+  doDrawWave(targetWaveFunc, ctx);
+  ctx.strokeStyle = `rgb(255,0,0)`;
+  ctx.lineWidth = 1;
+  ctx.stroke(); // strokes the drawing to the canvas
+}
+
+function doDrawWave(waveFunc, ctx) {
   ctx.beginPath();
 
   for(let x=0; x<=v; x+=1) {
@@ -77,14 +100,6 @@ function drawWave(waveFunc, ctx) {
     // let y = h/2 - waveFunc.value.a*hConst*Math.sin(waveFunc.value.b*vConst*x+(waveFunc.value.c*Math.PI/2));
     ctx.lineTo(x,y);
   }
-
-
-  ctx.strokeStyle = `rgb(200 255 200)`;
-  ctx.lineWidth = 2;
-  ctx.stroke(); // strokes the drawing to the canvas
-  ctx.strokeStyle = `rgb(0 255 0)`;
-  ctx.lineWidth = 1;
-  ctx.stroke(); // strokes the drawing to the canvas
 }
 
 onMounted(() => {

@@ -4,6 +4,7 @@ import {ref} from 'vue';
 import RotaryEncoder from '@/components/RotaryEncoder.vue';
 import StringDisplay from '@/components/StringDisplay.vue';
 import SineWave from '@/models/SineWave.js';
+import WaveGenerator from '@/service/WaveGenerator.js';
 
 const steps = ref(10);
 
@@ -12,6 +13,9 @@ const waveFunc = ref([
     new SineWave(2,3, 4),
     new SineWave(1,10, 3)
 ])
+
+const targetWave = ref(new WaveGenerator().randomWave());
+
 
 function addA(a,b) {
   waveFunc.value[a].a+=b;
@@ -28,7 +32,7 @@ function addC(a,b) {
 
 <template>
   <main>
-    <Display :wave-func="waveFunc" />
+    <Display :wave-func="waveFunc" :target-wave-func="targetWave"/>
     <div>
       <div v-for="(f,index) in waveFunc" class="wave-functions">
         <h2>
@@ -36,7 +40,7 @@ function addC(a,b) {
           Sine {{index}}</h2>
         <div class="rotary-input">
           <StringDisplay>{{f.a}}</StringDisplay>
-          <RotaryEncoder :max-steps="10" v-model:step="f.a" v-model:max-steps="steps"></RotaryEncoder>
+          <RotaryEncoder :max-steps="5" v-model:step="f.a" v-model:max-steps="steps"></RotaryEncoder>
         </div>
         <div class="rotary-input">
           <StringDisplay>{{f.b}}</StringDisplay>
@@ -44,7 +48,7 @@ function addC(a,b) {
         </div>
         <div class="rotary-input">
           <StringDisplay>{{f.c}}</StringDisplay>
-          <RotaryEncoder :max-steps="10" v-model:step="f.c" v-model:max-steps="steps"></RotaryEncoder>
+          <RotaryEncoder :max-steps="4" v-model:step="f.c" v-model:max-steps="steps"></RotaryEncoder>
         </div>
       </div>
     </div>
