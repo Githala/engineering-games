@@ -8,24 +8,30 @@ import WaveGenerator from '@/service/WaveGenerator.js';
 
 const steps = ref(10);
 
-const waveFunc = ref([
-    new SineWave(1,1, 2),
-    new SineWave(2,3, 4),
-    new SineWave(1,10, 3)
-])
+const waveFunc = ref([])
 
-const targetWave = ref(new WaveGenerator().randomWave());
+const targetWave = ref([]);
 
+fetch("http://localhost:3000")
+  .then(resp => resp.json())
+  .then(data => {
+    targetWave.value = data.targetWave.sineWaves
+    waveFunc.value = data.currentWave.sineWaves
+  })
 
-function addA(a,b) {
-  waveFunc.value[a].a+=b;
-}
-function addB(a,b) {
-  waveFunc.value[a].b += b;
-}
-function addC(a,b) {
-  waveFunc.value[a].c += b;
-}
+const socket = new WebSocket("ws://localhost:3001");
+socket.addEventListener("message", msg => {
+  waveFunc.value = JSON.parse(msg.data).sineWaves;
+});
+// function addA(a,b) {
+//   waveFunc.value[a].a+=b;
+// }
+// function addB(a,b) {
+//   waveFunc.value[a].b += b;
+// }
+// function addC(a,b) {
+//   waveFunc.value[a].c += b;
+// }
 
 
 </script>
@@ -33,10 +39,9 @@ function addC(a,b) {
 <template>
   <main>
     <Display :wave-func="waveFunc" :target-wave-func="targetWave"/>
-    <div>
+    <!-- <div>
       <div v-for="(f,index) in waveFunc" class="wave-functions">
         <h2>
-<!--          <input type="checkbox">-->
           Sine {{index}}</h2>
         <div class="rotary-input">
           <StringDisplay>{{f.a}}</StringDisplay>
@@ -51,7 +56,7 @@ function addC(a,b) {
           <RotaryEncoder :max-steps="4" v-model:step="f.c" v-model:max-steps="steps"></RotaryEncoder>
         </div>
       </div>
-    </div>
+    </div> -->
   </main>
 
 

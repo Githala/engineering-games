@@ -10,6 +10,12 @@ watch(() => props.waveFunc, (value) => {
   drawDisplay();
 }, { deep: true, immediate: true})
 
+watch(() => props.targetWaveFunc, (value) => {
+  console.log("target");
+  console.log(value);
+  drawDisplay();
+}, { deep: true, immediate: true})
+
 let v = 1000;
 let h = 500;
 let vConst = (Math.PI*2/v);
@@ -73,8 +79,8 @@ function drawGrid(ctx) {
 }
 
 function drawWave(waveFunc, ctx) {
- doDrawWave(waveFunc, ctx);
-
+  if (!waveFunc || waveFunc.length == 0 ) return;
+  doDrawWave(waveFunc, ctx);
   ctx.strokeStyle = `rgb(200 255 200)`;
   ctx.lineWidth = 2;
   ctx.stroke(); // strokes the drawing to the canvas
@@ -84,6 +90,7 @@ function drawWave(waveFunc, ctx) {
 }
 
 function drawTargetWave(targetWaveFunc, ctx) {
+  if (!targetWaveFunc || targetWaveFunc.length == 0 ) return;
   doDrawWave(targetWaveFunc, ctx);
   ctx.strokeStyle = `rgb(255,0,0)`;
   ctx.lineWidth = 1;
@@ -94,7 +101,7 @@ function doDrawWave(waveFunc, ctx) {
   ctx.beginPath();
 
   for(let x=0; x<=v; x+=1) {
-    let ys = waveFunc.map((func) => func.a*hConst*Math.sin(func.b*vConst*x+(func.c*Math.PI/2)));
+    let ys = waveFunc.map((func) => func.amplitude*hConst*Math.sin(func.frequency*vConst*x+(func.phaseShift*Math.PI/2)));
 
     let y = h/2 - ys.reduce((a,b) => a+b);
     // let y = h/2 - waveFunc.value.a*hConst*Math.sin(waveFunc.value.b*vConst*x+(waveFunc.value.c*Math.PI/2));
