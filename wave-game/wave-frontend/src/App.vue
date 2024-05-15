@@ -23,15 +23,6 @@ const socket = new WebSocket("ws://localhost:3001");
 socket.addEventListener("message", msg => {
   waveFunc.value = JSON.parse(msg.data).sineWaves;
 });
-// function addA(a,b) {
-//   waveFunc.value[a].a+=b;
-// }
-// function addB(a,b) {
-//   waveFunc.value[a].b += b;
-// }
-// function addC(a,b) {
-//   waveFunc.value[a].c += b;
-// }
 
 
 </script>
@@ -39,27 +30,7 @@ socket.addEventListener("message", msg => {
 <template>
   <main>
     <Display :wave-func="waveFunc" :target-wave-func="targetWave"/>
-    <!-- <div>
-      <div v-for="(f,index) in waveFunc" class="wave-functions">
-        <h2>
-          Sine {{index}}</h2>
-        <div class="rotary-input">
-          <StringDisplay>{{f.a}}</StringDisplay>
-          <RotaryEncoder :max-steps="5" v-model:step="f.a" v-model:max-steps="steps"></RotaryEncoder>
-        </div>
-        <div class="rotary-input">
-          <StringDisplay>{{f.b}}</StringDisplay>
-          <RotaryEncoder :max-steps="10" v-model:step="f.b" v-model:max-steps="steps"></RotaryEncoder>
-        </div>
-        <div class="rotary-input">
-          <StringDisplay>{{f.c}}</StringDisplay>
-          <RotaryEncoder :max-steps="4" v-model:step="f.c" v-model:max-steps="steps"></RotaryEncoder>
-        </div>
-      </div>
-    </div> -->
   </main>
-
-
 </template>
 
 <style scoped>
