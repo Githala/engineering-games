@@ -1,12 +1,6 @@
 <script setup>
 import Display from '@/components/GraphDisplay.vue';
 import {ref} from 'vue';
-import RotaryEncoder from '@/components/RotaryEncoder.vue';
-import StringDisplay from '@/components/StringDisplay.vue';
-import SineWave from '@/models/SineWave.js';
-import WaveGenerator from '@/service/WaveGenerator.js';
-
-const steps = ref(10);
 
 const waveFunc = ref([])
 
@@ -23,7 +17,6 @@ const socket = new WebSocket("ws://localhost:3001");
 socket.addEventListener("message", msg => {
   waveFunc.value = JSON.parse(msg.data).sineWaves;
 });
-
 
 </script>
 

@@ -7,8 +7,6 @@ export default class WSServer {
     constructor() {
         this.wss = new WebSocket.Server({ port: 3001 });
         this.clients = [];
-        console.log("YOOOO")
-        console.log(this.clients);
 
         this.wss.on('connection', (ws: WebSocket) => {
             console.log('New client connected');
