@@ -19,7 +19,7 @@ watch(() => props.targetWaveFunc, (value) => {
 let v = 1000;
 let h = 500;
 let vConst = (Math.PI*2/v);
-let hConst = h/16
+let hConst = h/32
 
 
 function drawDisplay() {
@@ -30,6 +30,7 @@ function drawDisplay() {
   if (ctx) {
     clearCanvas(ctx);
     drawGrid(ctx);
+    waveFunc.forEach(sw => drawSimpleWave([sw], ctx));
     drawWave(waveFunc, ctx);
     drawTargetWave(targetWaveFunc, ctx);
   }
@@ -47,13 +48,13 @@ function clearCanvas(ctx) {
 function drawGrid(ctx) {
   ctx.beginPath();
   // Draw vertical lines
-  for(let x = 0; x <= v; x += v/32) {
+  for(let x = 0; x <= v; x += v/64) {
     ctx.moveTo(x, h);
     ctx.lineTo(x, 0);
   }
 
   // Draw horizontal lines
-  for(let y = 0; y <= h; y += h/16) {
+  for(let y = 0; y <= h; y += h/32) {
     ctx.moveTo(v, y);
     ctx.lineTo(0, y);
   }
@@ -85,6 +86,14 @@ function drawWave(waveFunc, ctx) {
   ctx.lineWidth = 2;
   ctx.stroke(); // strokes the drawing to the canvas
   ctx.strokeStyle = `rgb(0 255 0)`;
+  ctx.lineWidth = 1;
+  ctx.stroke(); // strokes the drawing to the canvas
+}
+
+function drawSimpleWave(waveFunc, ctx) {
+  if (!waveFunc || waveFunc.length == 0 ) return;
+  doDrawWave(waveFunc, ctx);
+  ctx.strokeStyle = `rgb(100 100 0)`;
   ctx.lineWidth = 1;
   ctx.stroke(); // strokes the drawing to the canvas
 }

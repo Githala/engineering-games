@@ -1,11 +1,10 @@
 import ComplexWave from '../models/ComplexWave';
-import SineWave from '../models/SineWave';
 
 export default class WaveGenerator {
 
 	randomWave(): ComplexWave {
-		let nrOfWaves = this.getRandomInt(1, 3);
-		return { sineWaves: [...Array(nrOfWaves)].map(() => this.getRandomSineWave()) };
+		let nrOfWaves = this.getRandomInt(2, 2);
+		return new ComplexWave([...Array(nrOfWaves)].map(() => this.getRandomSineWave()));
 	}
 
     private getRandomSineWave() {

@@ -1,6 +1,5 @@
 import ComplexWave from "../models/ComplexWave";
 import InputOperation from "../models/InputOperation";
-import SineWave from "../models/SineWave";
 import WaveGenerator from "../service/WaveGenerator"
 import { Operator } from "../models/Operator";
 
@@ -9,45 +8,72 @@ export default class GameEngine {
     private waveGenerator: WaveGenerator = new WaveGenerator();
     private targetWave: ComplexWave;
     private currentWave: ComplexWave;
-    private currentSineWave: SineWave;
+    private currentSineWaveIndex: number;
 
-    private updateCallback: (message: ComplexWave) => void
+    private updateCallback: (message: {currentWave: ComplexWave, currentSineWaveIndex: number}) => void
 
-    constructor(updateCallback: (message: ComplexWave) => void) {
+    constructor(updateCallback: (message: {currentWave: ComplexWave, currentSineWaveIndex: number}) => void) {
         this.targetWave = this.waveGenerator.randomWave();
-        this.currentWave =  { sineWaves: [
-            {amplitude: 1, frequency: 1, phaseShift: 1}
-        ] }
-        this.currentSineWave = this.currentWave.sineWaves[0];
+        this.currentWave =  new ComplexWave([
+            {amplitude: 1, frequency: 1, phaseShift: 0},
+            {amplitude: 0, frequency: 1, phaseShift: 0},
+            {amplitude: 0, frequency: 1, phaseShift: 0}
+        ]);
+        this.currentSineWaveIndex = 0;
         this.updateCallback = updateCallback;
     }
 
-    updateAmplitude(inputOperation: InputOperation) {
+    updateWave(inputOperation: InputOperation) {
+        const currentSineWave = this.currentWave.get(this.currentSineWaveIndex);
         
+        if(inputOperation.inputNumer === 0) {
+            switch(inputOperation.operator) {
+                case Operator.INC: currentSineWave.amplitude++; break;
+                case Operator.DEC: currentSineWave.amplitude--; break;
+            }
+            if(currentSineWave.amplitude < 0) currentSineWave.amplitude = 0;
+        }
         if(inputOperation.inputNumer === 1) {
             switch(inputOperation.operator) {
-                case Operator.INC: this.currentSineWave.amplitude++; break;
-                case Operator.DEC: this.currentSineWave.amplitude--; break;
+                case Operator.INC: currentSineWave.frequency++; break;
+                case Operator.DEC: currentSineWave.frequency--; break;
             }
+            if(currentSineWave.frequency < 1) currentSineWave.frequency = 1;
         }
         if(inputOperation.inputNumer === 2) {
             switch(inputOperation.operator) {
-                case Operator.INC: this.currentSineWave.frequency++; break;
-                case Operator.DEC: this.currentSineWave.frequency--; break;
+                case Operator.INC: currentSineWave.phaseShift++; break;
+                case Operator.DEC: currentSineWave.phaseShift--; break;
             }
-        }
-        if(inputOperation.inputNumer === 3) {
-            switch(inputOperation.operator) {
-                case Operator.INC: this.currentSineWave.phaseShift++; break;
-                case Operator.DEC: this.currentSineWave.phaseShift--; break;
-            }
+            currentSineWave.phaseShift%=4;
+            if (currentSineWave.phaseShift < 0) currentSineWave.phaseShift = 3;
         }
         
-        this.updateCallback(this.currentWave);
+        this.updateCallback({currentWave: this.currentWave, currentSineWaveIndex: this.currentSineWaveIndex});
+    }
+
+    nextWave() {
+        this.currentSineWaveIndex = (this.currentSineWaveIndex+1) % this.currentWave.length();
+    }
+
+    prevWave() {
+        this.currentSineWaveIndex = (this.currentSineWaveIndex-1) % this.currentWave.length();
+    }
+
+    newTargetWave() {
+        this.targetWave = this.waveGenerator.randomWave();
+    }
+
+    resetWave() {
+        this.currentWave = new ComplexWave([
+            {amplitude: 1, frequency: 1, phaseShift: 0},
+            {amplitude: 0, frequency: 1, phaseShift: 0},
+            {amplitude: 0, frequency: 1, phaseShift: 0}
+        ]);
     }
 
     getCurrentState() {
-        return {currentWave: this.currentWave, targetWave: this.targetWave};
+        return {currentWave: this.currentWave, targetWave: this.targetWave, currentSineWaveIndex: this.currentSineWaveIndex};
     }
 }
 

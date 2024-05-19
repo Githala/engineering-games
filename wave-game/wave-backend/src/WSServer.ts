@@ -1,8 +1,10 @@
 import WebSocket from 'ws';
+import GameEngine from './service/GameEngine';
 
 export default class WSServer {
     private wss;
     private clients: WebSocket[]
+    private messageCallbacks: {(param:string): void;}[] = [];
 
     constructor() {
         this.wss = new WebSocket.Server({ port: 3001 });
@@ -17,6 +19,10 @@ export default class WSServer {
         });
     }
 
+    addMessageCallback(callback: {(param:string): void}) {
+        this.messageCallbacks.push(callback);
+    }
+
     sendMessage = (message: any) => {
         this.clients.forEach(client => {
             client.send(JSON.stringify(message));
@@ -24,8 +30,8 @@ export default class WSServer {
     }
 
     private handleMessageReceived(message: string, ws: WebSocket) {
-        console.log(`Received message: ${message}`);
-        ws.send(`Server received your message: ${message}`);
+        console.log(message.toString());
+        this.messageCallbacks.forEach(cb => cb(message.toString()));
     }
 
     private close(ws: WebSocket) {
