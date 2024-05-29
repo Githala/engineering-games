@@ -15,6 +15,10 @@ export default class ComplexWave {
 		}
 	}
 
+	waves() {
+		return this.sineWaves;
+	}
+
 	length() {
 		return this.sineWaves.length;
 	}
