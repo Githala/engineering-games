@@ -136,5 +136,8 @@ onMounted(() => {
     justify-content: center;
     align-items: center;
     border: 2px solid grey;
+    width: 1000px;
+    height: 500px;
+    box-sizing: content-box;
   }
 </style>

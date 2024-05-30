@@ -64,9 +64,9 @@ function newTarget() {
       }
     </div>
     </div>
-    <button :onclick="newTarget">New</button>
+    <!-- <button :onclick="newTarget">New</button>
     <button :onclick="next">Next</button>
-    <button :onclick="prev">Prev</button>
+    <button :onclick="prev">Prev</button> -->
   </main>
 </template>
 
@@ -74,6 +74,9 @@ function newTarget() {
 main {
   width: 1024;
   height: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   
 }
 
@@ -81,6 +84,8 @@ main {
   margin: 10px 0px;
   padding: 5px 10px;
   border: 2px solid grey;
+  width: 980px;
+  box-sizing: content-box;
 }
 
 .selected {
@@ -116,8 +121,8 @@ h2 {
   position: absolute;
   top: 0px; 
   left: 0px;
-  height: 500px;
-  width: 1000px;
+  height: 504px;
+  width: 1004px;
   font-size: 72px;
   text-align: center;
   line-height: 500px;
