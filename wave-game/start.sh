@@ -1,3 +1,3 @@
 #!/bin/sh
 
-node wave-backend/dist/main.js
+(cd wave-backend; node dist/main.js)
