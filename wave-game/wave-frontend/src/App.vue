@@ -11,7 +11,7 @@ const currentSineWaveIndex = ref(0);
 const solved = ref(false);
 
 function getState() {
-  fetch("http://localhost:3000")
+  fetch("http://localhost:3000/state")
     .then(resp => resp.json())
     .then(data => {
       targetWave.value = data.targetWave.sineWaves

@@ -16,13 +16,14 @@ const port = 3000;
 const serialVendorID = "1a86";
 const serialProductID = "7523";
 
+app.use(express.static("../wave-frontend/dist"))
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
 
-app.get('/', (_, res) => {
+app.get('/state', (_, res) => {
   res.send(JSON.stringify(gameEngine.getCurrentState()));
 });
 
