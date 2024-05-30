@@ -3,32 +3,40 @@ import InputOperation from "../models/InputOperation";
 import WaveGenerator from "../service/WaveGenerator"
 import { Operator } from "../models/Operator";
 
+type GameState = {currentWave: ComplexWave, targetWave: ComplexWave, currentSineWaveIndex: number, solved: boolean}
+
 export default class GameEngine {
 
     private waveGenerator: WaveGenerator = new WaveGenerator();
-    private targetWave: ComplexWave;
-    private currentWave: ComplexWave;
-    private currentSineWaveIndex: number;
-    private solved: boolean;
+    private gameState: GameState;
+    private callbacks: ((message: GameState) => void)[] = [];
+    // private solvedCallbacks: (() => void)[] = [];
+    // private newGameCallbacks: (() => void)[] = [];
 
-    private updateCallback: (message: {currentWave: ComplexWave, currentSineWaveIndex: number}) => void
+    constructor() {
+        this.gameState = this.newGameState()
+    }
 
-    constructor(updateCallback: (message: {currentWave: ComplexWave, currentSineWaveIndex: number}) => void) {
-        this.targetWave = this.waveGenerator.randomWave();
-        this.currentWave =  new ComplexWave([
-            {amplitude: 1, frequency: 1, phaseShift: 0},
-            {amplitude: 0, frequency: 1, phaseShift: 0},
-            {amplitude: 0, frequency: 1, phaseShift: 0}
-        ]);
-        this.currentSineWaveIndex = 0;
-        this.updateCallback = updateCallback;
-        this.solved = false;
+    newGameState() {
+        return {
+            targetWave: this.waveGenerator.randomWave(1, 2),
+            currentWave: new ComplexWave([
+                {amplitude: 1, frequency: 1, phaseShift: 0},
+                {amplitude: 0, frequency: 1, phaseShift: 0},
+            ]),
+            currentSineWaveIndex: 0,
+            solved: false
+        };
+    }
+
+    addUpdateCallback(cb: (message: GameState) => void) {
+        this.callbacks.push(cb);
     }
 
     updateWave(inputOperation: InputOperation) {
-        if (this.solved) return;
+        if (this.gameState.solved) return;
 
-        const currentSineWave = this.currentWave.get(this.currentSineWaveIndex);
+        const currentSineWave = this.gameState.currentWave.get(this.gameState.currentSineWaveIndex);
         
         if(inputOperation.inputNumer === 0) {
             switch(inputOperation.operator) {
@@ -53,24 +61,33 @@ export default class GameEngine {
             if (currentSineWave.phaseShift < 0) currentSineWave.phaseShift = 3;
         }
         
-        this.solved = this.validate(this.currentWave, this.targetWave);
-        this.updateCallback({currentWave: this.currentWave, currentSineWaveIndex: this.currentSineWaveIndex});
+        if(this.validate(this.gameState.currentWave, this.gameState.targetWave)) {
+            this.setSolved();
+        }
+        this.callCallbacks();
     }
 
     nextWave() {
-        this.currentSineWaveIndex = (this.currentSineWaveIndex+1) % this.currentWave.length();
+        this.gameState.currentSineWaveIndex = (this.gameState.currentSineWaveIndex+1) % this.gameState.currentWave.length();
     }
 
     prevWave() {
-        this.currentSineWaveIndex = (this.currentSineWaveIndex-1) % this.currentWave.length();
+        this.gameState.currentSineWaveIndex = (this.gameState.currentSineWaveIndex-1) % this.gameState.currentWave.length();
+    }
+
+    setWave(i: number) {
+        if (i < this.gameState.currentWave.length() && i >= 0) {
+            this.gameState.currentSineWaveIndex = i;
+        }
+        this.callCallbacks();
     }
 
     newTargetWave() {
-        this.targetWave = this.waveGenerator.randomWave();
+        this.gameState = this.newGameState();
     }
 
     resetWave() {
-        this.currentWave = new ComplexWave([
+        this.gameState.currentWave = new ComplexWave([
             {amplitude: 1, frequency: 1, phaseShift: 0},
             {amplitude: 0, frequency: 1, phaseShift: 0},
             {amplitude: 0, frequency: 1, phaseShift: 0}
@@ -78,7 +95,7 @@ export default class GameEngine {
     }
 
     getCurrentState() {
-        return {currentWave: this.currentWave, targetWave: this.targetWave, currentSineWaveIndex: this.currentSineWaveIndex};
+        return this.gameState;
     }
 
     private validate(currentWave: ComplexWave, targetWave: ComplexWave) {
@@ -88,11 +105,20 @@ export default class GameEngine {
 
             let targetYs = targetWave.waves().map((func) => func.amplitude*Math.sin(func.frequency*x+(func.phaseShift*Math.PI/2)));
             let targetY = targetYs.reduce((a,b) => a+b);
-            if (currentY !== targetY) {
+            if (Math.abs(currentY - targetY) > 0.00001) {
                 return false;
             }
         }
         return true;
+    }
+
+    private callCallbacks() {
+        this.callbacks.forEach(cb => cb(this.gameState));
+    }
+
+    private setSolved() {
+        this.gameState.solved = true;
+        this.callCallbacks();
     }
 }
 

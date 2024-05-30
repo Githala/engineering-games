@@ -2,8 +2,8 @@ import ComplexWave from '../models/ComplexWave';
 
 export default class WaveGenerator {
 
-	randomWave(): ComplexWave {
-		let nrOfWaves = this.getRandomInt(2, 2);
+	randomWave(min: number, max: number): ComplexWave {
+		let nrOfWaves = this.getRandomInt(min, max);
 		return new ComplexWave([...Array(nrOfWaves)].map(() => this.getRandomSineWave()));
 	}
 

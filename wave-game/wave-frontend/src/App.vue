@@ -8,6 +8,8 @@ const targetWave = ref([]);
 
 const currentSineWaveIndex = ref(0);
 
+const solved = ref(false);
+
 function getState() {
   fetch("http://localhost:3000")
     .then(resp => resp.json())
@@ -15,6 +17,7 @@ function getState() {
       targetWave.value = data.targetWave.sineWaves
       waveFunc.value = data.currentWave.sineWaves
       currentSineWaveIndex.value = data.currentSineWaveIndex;
+      solved.value = data.solved;
     })
 }
 
@@ -25,7 +28,9 @@ const socket = new WebSocket("ws://localhost:3001");
 socket.addEventListener("message", msg => {
   const data = JSON.parse(msg.data);
   waveFunc.value = data.currentWave.sineWaves;
+  targetWave.value = data.targetWave.sineWaves;
   currentSineWaveIndex.value = data.currentSineWaveIndex;
+  solved.value = data.solved;
 });
 
 function next() {
@@ -37,6 +42,7 @@ function prev() {
   getState();
 }
 function newTarget() {
+  socket.send("action:newTarget");
   getState();
 }
 
@@ -44,7 +50,10 @@ function newTarget() {
 
 <template>
   <main>
-    <Display :wave-func="waveFunc" :target-wave-func="targetWave"/>
+    <div style="position: relative;">
+      <Display :wave-func="waveFunc" :target-wave-func="targetWave"/>
+      <div class="solvedMessage" v-if="solved">FREQUENCIES IN SYNC!</div>
+    </div>
     <div class="info">
       <div v-for="wave,index in waveFunc" :class="{selected: index===currentSineWaveIndex}">
         Wave{{index}} 
@@ -65,6 +74,7 @@ function newTarget() {
 main {
   width: 1024;
   height: 600;
+  
 }
 
 .info {
@@ -100,5 +110,21 @@ h2 {
   border-bottom: 1px solid grey;
   padding-bottom: 20px;
   margin-bottom: 10px;
+}
+
+.solvedMessage {
+  position: absolute;
+  top: 0px; 
+  left: 0px;
+  height: 500px;
+  width: 1000px;
+  font-size: 72px;
+  text-align: center;
+  line-height: 500px;
+  color: #aaeeaa;
+  text-shadow: 0 0 25px green,
+               0 0 25px green,
+               0 0 25px green,
+               0 0 25px green;
 }
 </style>

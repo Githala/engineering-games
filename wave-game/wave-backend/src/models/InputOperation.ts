@@ -6,11 +6,11 @@ export default interface InputOperator {
     operator: Operator;
 }
 
-export function parseInputData(inputData: string): InputOperator {
+export function parseRotInputData(inputData: string): InputOperator {
     const split = inputData.split(":");
-    const inputNumber = parseInt(split[0]);
-    const operator = split[1] == "1" ? Operator.INC :
-                     split[1] == "-1" ? Operator.DEC : undefined;
+    const inputNumber = parseInt(split[1]);
+    const operator = split[2] == "1" ? Operator.INC :
+                     split[2] == "-1" ? Operator.DEC : undefined;
 
 
     if (inputNumber !== undefined && operator !== undefined) {
@@ -18,4 +18,9 @@ export function parseInputData(inputData: string): InputOperator {
     } else {
         throw new Error("cannot parse input");
     }
-} 
+}
+
+export function parseWaveInputData(inputData: string) {
+    const split = inputData.split(":");
+    return parseInt(split[1]);
+}

@@ -3,7 +3,7 @@ import express, { Request, Response } from 'express';
 import WSServer from "./WSServer";
 import GameEngine from './service/GameEngine';
 import { Operator } from "./models/Operator";
-import { parseInputData } from './models/InputOperation';
+import { parseRotInputData, parseWaveInputData } from './models/InputOperation';
 
 const app = express();
 const port = 3000;
@@ -32,7 +32,7 @@ app.listen(port, () => {
 
 
 const server = new WSServer();
-const gameEngine = new GameEngine(server.sendMessage);
+const gameEngine = new GameEngine();
 server.addMessageCallback((message => {
   switch(message) {
     case "action:next": gameEngine.nextWave(); break;
@@ -40,9 +40,11 @@ server.addMessageCallback((message => {
     case "action:newTarget":gameEngine.newTargetWave(); break;
   }
 }));
+gameEngine.addUpdateCallback(server.sendMessage);
+// gameEngine.addSolvedCallback(() => server.sendMessage({solved:true}));
 
 SerialPort.list().then((ports) => {
-  const serialInput = ports.find(p => p.vendorId === "1a86" && p.productId === "7523")?.path
+  const serialInput = ports.find(p => p.vendorId === "0403" && p.productId === "6001")?.path
   if (serialInput!==undefined) attachSerialInput(serialInput!)
   else console.error("No serial input device found.");
 })
@@ -54,9 +56,12 @@ function attachSerialInput(serialInput: string) {
   const parser = serialport.pipe(new ReadlineParser({ delimiter: '\r\n' }))
   parser.on('data', (data: string) => {
       console.log(data)
-      if(/^[0-9]:-?1/.test(data)) {
-        const InputOperation = parseInputData(data);
+      if(/^rot:[0-9]:-?1/.test(data)) {
+        const InputOperation = parseRotInputData(data);
         gameEngine.updateWave(InputOperation);
+      } else if(/^wave:[0-9]/.test(data)) {
+        const waveNr = parseWaveInputData(data);
+        gameEngine.setWave(waveNr)
       }
   });
   
