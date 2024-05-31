@@ -35,15 +35,15 @@ socket.addEventListener("message", msg => {
 
 function next() {
   socket.send("action:next");
-  getState()
+  // getState()
 }
 function prev() {
   socket.send("action:prev");
-  getState();
+  // getState();
 }
 function newTarget() {
   socket.send("action:newTarget");
-  getState();
+  // getState();
 }
 
 </script>
@@ -64,9 +64,6 @@ function newTarget() {
       }
     </div>
     </div>
-    <!-- <button :onclick="newTarget">New</button>
-    <button :onclick="next">Next</button>
-    <button :onclick="prev">Prev</button> -->
   </main>
 </template>
 

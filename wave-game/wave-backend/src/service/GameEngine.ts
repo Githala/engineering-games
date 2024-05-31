@@ -17,7 +17,7 @@ export default class GameEngine {
         this.gameState = this.newGameState()
     }
 
-    newGameState() {
+    private newGameState() {
         return {
             targetWave: this.waveGenerator.randomWave(1, 2),
             currentWave: new ComplexWave([
@@ -82,8 +82,9 @@ export default class GameEngine {
         this.callCallbacks();
     }
 
-    newTargetWave() {
+    newGame() {
         this.gameState = this.newGameState();
+        this.callCallbacks();
     }
 
     resetWave() {

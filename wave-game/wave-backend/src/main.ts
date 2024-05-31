@@ -13,8 +13,11 @@ const port = 3000;
 // const serialProductID = "ea60"; 
 
 // Arduino Nano v3
-const serialVendorID = "1a86";
-const serialProductID = "7523";
+// const serialVendorID = "1a86";
+// const serialProductID = "7523";
+
+// const serialVendorID = "0403"
+// const serialProductID = "6001";
 
 app.use(express.static("../wave-frontend/dist"))
 app.use((req, res, next) => {
@@ -38,14 +41,14 @@ server.addMessageCallback((message => {
   switch(message) {
     case "action:next": gameEngine.nextWave(); break;
     case "action:prev": gameEngine.prevWave(); break;
-    case "action:newTarget":gameEngine.newTargetWave(); break;
+    case "action:newTarget":gameEngine.newGame(); break;
   }
 }));
 gameEngine.addUpdateCallback(server.sendMessage);
 // gameEngine.addSolvedCallback(() => server.sendMessage({solved:true}));
 
 SerialPort.list().then((ports) => {
-  const serialInput = ports.find(p => p.vendorId === "0403" && p.productId === "6001")?.path
+  const serialInput = ports.find(p => p.vendorId === "1a86" && p.productId === "7523")?.path
   if (serialInput!==undefined) attachSerialInput(serialInput!)
   else console.error("No serial input device found.");
 })
@@ -62,7 +65,13 @@ function attachSerialInput(serialInput: string) {
         gameEngine.updateWave(InputOperation);
       } else if(/^wave:[0-9]/.test(data)) {
         const waveNr = parseWaveInputData(data);
-        gameEngine.setWave(waveNr)
+        // Ugly hack, but too lazy to update ARDUINO code atm
+        if (waveNr < 2) {
+          gameEngine.setWave(waveNr)
+        } else if (waveNr === 2) {
+          gameEngine.newGame();
+        }
+        
       }
   });
   
